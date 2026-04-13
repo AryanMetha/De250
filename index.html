@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tmbre Lab — Timbre Perception Game</title>
+<title>Tmbre Lab : Timbre Perception Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -122,6 +122,16 @@
   @keyframes pulse-urgent {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+  }
+
+  @keyframes penalty-flash {
+    0%   { background: rgba(248,113,113,0.35); color: var(--red); transform: scale(1.08); }
+    60%  { background: rgba(248,113,113,0.12); }
+    100% { background: var(--surface2); transform: scale(1); }
+  }
+  .timer-display.penalty-flash {
+    animation: penalty-flash 0.6s ease-out forwards !important;
+    border-color: var(--red) !important;
   }
 
   .btn {
@@ -615,7 +625,7 @@
       </div>
       <div class="card-btn-row">
         <div class="play-btn" id="playbtn-flute" title="Play / Stop">▶</div>
-        <div class="info-btn" title="About this instrument" onclick="openInfo('flute'); event.stopPropagation();">i</div>
+        <div class="info-btn" title="Hint — costs 20 sec" onclick="openInfo('flute'); event.stopPropagation();">i</div>
       </div>
     </div>
 
@@ -628,7 +638,7 @@
       </div>
       <div class="card-btn-row">
         <div class="play-btn" id="playbtn-clarinet" title="Play / Stop">▶</div>
-        <div class="info-btn" title="About this instrument" onclick="openInfo('clarinet'); event.stopPropagation();">i</div>
+        <div class="info-btn" title="Hint — costs 20 sec" onclick="openInfo('clarinet'); event.stopPropagation();">i</div>
       </div>
     </div>
 
@@ -641,7 +651,7 @@
       </div>
       <div class="card-btn-row">
         <div class="play-btn" id="playbtn-violin" title="Play / Stop">▶</div>
-        <div class="info-btn" title="About this instrument" onclick="openInfo('violin'); event.stopPropagation();">i</div>
+        <div class="info-btn" title="Hint — costs 20 sec" onclick="openInfo('violin'); event.stopPropagation();">i</div>
       </div>
     </div>
 
@@ -654,7 +664,7 @@
       </div>
       <div class="card-btn-row">
         <div class="play-btn" id="playbtn-trumpet" title="Play / Stop">▶</div>
-        <div class="info-btn" title="About this instrument" onclick="openInfo('trumpet'); event.stopPropagation();">i</div>
+        <div class="info-btn" title="Hint — costs 20 sec" onclick="openInfo('trumpet'); event.stopPropagation();">i</div>
       </div>
     </div>
   </section>
@@ -784,7 +794,23 @@ const INFO_DATA = {
   },
 };
 
+const HINT_PENALTY = 20;       // seconds deducted per hint
+const hintUsed = new Set();   // track which instruments have been peeked
+
 function openInfo(name) {
+  // ── Penalty: −20s first time each instrument is opened ──
+  if (!hintUsed.has(name) && timerInterval !== null) {
+    hintUsed.add(name);
+    remaining = Math.max(0, remaining - HINT_PENALTY);
+    updateTimerDisplay();
+    if (remaining <= 30) document.getElementById('timerDisplay').classList.add('urgent');
+    if (remaining <= 0) { clearInterval(timerInterval); timerInterval = null; checkAnswers(); }
+    // Flash the timer red briefly so the player notices
+    const td = document.getElementById('timerDisplay');
+    td.classList.add('penalty-flash');
+    setTimeout(() => td.classList.remove('penalty-flash'), 600);
+  }
+
   const d = INFO_DATA[name];
   document.getElementById('sheetIcon').textContent     = d.icon;
   document.getElementById('sheetTitle').textContent    = name.charAt(0).toUpperCase() + name.slice(1);
@@ -1298,6 +1324,8 @@ function updateTimerDisplay() {
 function resetGame() {
   stopAll();
   clearInterval(timerInterval);
+  timerInterval = null;
+  hintUsed.clear();
   document.getElementById('timerDisplay').classList.remove('urgent');
   buildDescCards();
   startTimer();

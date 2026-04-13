@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tmbre Lab:   Timbre Perception Game</title>
+<title>Tmbre Lab — Timbre Perception Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -23,7 +23,6 @@
     --accent3: #fb923c;
     --green: #4ade80;
     --red: #f87171;
-    --yellow: #fbbf24;
     --card-radius: 14px;
     --glow-accent: 0 0 20px rgba(126,232,250,0.15);
     --glow-green: 0 0 20px rgba(74,222,128,0.2);
@@ -104,25 +103,6 @@
   }
 
   .topbar-spacer { flex: 1; }
-
-  .difficulty-select {
-    appearance: none;
-    background: var(--surface2);
-    border: 1px solid var(--border-bright);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    padding: 8px 36px 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    outline: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .difficulty-select:hover { border-color: var(--accent); box-shadow: var(--glow-accent); }
 
   .timer-display {
     font-family: 'DM Mono', monospace;
@@ -208,13 +188,6 @@
   }
   .col-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /*
-    KEY FIX: overflow is NOT hidden on instrument cards.
-    The old overflow:hidden was clipping the ::before pseudo-element
-    and   more importantly   was causing the browser to create a new
-    stacking context that ate pointer events from the info-btn.
-    Ripple removal via JS timeout handles the visual cleanup instead.
-  */
   .instrument-card {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -230,21 +203,6 @@
   .instrument-card:hover { border-color: var(--border-bright); transform: translateX(4px); }
   .instrument-card:active { transform: translateX(2px) scale(0.98); }
   .instrument-card.playing { border-color: var(--accent); box-shadow: var(--glow-accent); }
-
-  /*
-    KEY FIX: loading-disabled no longer uses pointer-events:none on the card.
-    Instead a ::after pseudo overlay blocks the card area (z-index 1),
-    while the card-btn-row sits at z-index 2   so buttons always fire.
-  */
-  .instrument-card.loading-disabled { opacity: 0.55; cursor: wait; }
-  .instrument-card.loading-disabled::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: var(--card-radius);
-    z-index: 1;
-    cursor: wait;
-  }
 
   .instrument-icon {
     width: 56px;
@@ -288,7 +246,7 @@
   .instrument-card.playing .waveform-wrap { opacity: 1; }
   .waveform-canvas { width: 100%; height: 100%; display: block; }
 
-  /* z-index:2 keeps buttons above the loading overlay */
+  /* z-index:2 keeps buttons above any overlays */
   .card-btn-row {
     display: flex;
     gap: 8px;
@@ -311,9 +269,15 @@
     color: var(--text-muted);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    font-size: 13px;
   }
-  .instrument-card:hover .play-btn { border-color: var(--accent); color: var(--accent); }
-  .instrument-card.playing .play-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .play-btn:hover { border-color: var(--accent); color: var(--accent); }
+  /* When playing: play btn becomes a stop btn — filled accent with ■ */
+  .instrument-card.playing .play-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
   .info-btn {
     font-family: 'Instrument Serif', serif;
     font-style: italic;
@@ -407,26 +371,6 @@
   }
   .score-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
   .score-msg { font-size: 0.9rem; color: var(--text); flex: 1; }
-
-  /* ── LOAD STATUS ── */
-  .load-status {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--accent);
-    letter-spacing: 0.06em;
-    text-align: center;
-    padding: 6px 16px;
-    background: rgba(126,232,250,0.06);
-    border-bottom: 1px solid rgba(126,232,250,0.1);
-    animation: blink 1.4s infinite;
-    position: relative;
-    z-index: 10;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
 
   /* Ripple */
   @keyframes ripple {
@@ -543,9 +487,6 @@
   }
   .sheet-close:hover { border-color: var(--red); color: var(--red); }
 
-
-
-  /* Info sections */
   .info-section { margin-bottom: 26px; }
   .info-section-label {
     font-family: 'DM Mono', monospace;
@@ -561,7 +502,6 @@
   .info-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .info-section-body { font-size: 0.875rem; color: var(--text-muted); line-height: 1.72; }
 
-  /* Harmonic bar chart */
   .harmonic-chart {
     display: flex;
     align-items: flex-end;
@@ -580,7 +520,6 @@
   }
   .harmonic-n { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--text-dim); }
 
-  /* Image placeholder grid */
   .img-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -600,45 +539,14 @@
     justify-content: center;
     gap: 6px;
   }
-  .img-slot img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-  .img-slot-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-  .img-slot-path {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
-    color: var(--text-dim);
-    opacity: 0.6;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-  .img-slot-icon {
-    font-size: 1.5rem;
-    opacity: 0.2;
-    position: relative;
-    z-index: 1;
-  }
-  /* hide placeholder content once image loads */
+  .img-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  .img-slot-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: center; position: relative; z-index: 1; }
+  .img-slot-path { font-family: 'DM Mono', monospace; font-size: 0.55rem; color: var(--text-dim); opacity: 0.6; text-align: center; position: relative; z-index: 1; }
+  .img-slot-icon { font-size: 1.5rem; opacity: 0.2; position: relative; z-index: 1; }
   .img-slot img.loaded ~ .img-slot-icon,
   .img-slot img.loaded ~ .img-slot-label,
   .img-slot img.loaded ~ .img-slot-path { display: none; }
 
-  /* Fact + tip pills */
   .fact-pill, .tip-pill {
     display: flex;
     gap: 12px;
@@ -650,7 +558,7 @@
   .fact-pill { background: rgba(192,132,252,0.04); border: 1px solid rgba(192,132,252,0.12); }
   .tip-pill  { background: rgba(126,232,250,0.04); border: 1px solid rgba(126,232,250,0.10); }
   .fact-icon { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent2); flex-shrink: 0; margin-top: 2px; letter-spacing: 0.04em; }
-  .tip-icon  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent);  flex-shrink: 0; margin-top: 2px; }
+  .tip-icon  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
   .fact-text, .tip-text { font-size: 0.84rem; color: var(--text-muted); line-height: 1.65; }
 
   /* ── MOBILE ── */
@@ -674,12 +582,6 @@
     <span>Timbre Perception</span>
   </div>
 
-  <select class="difficulty-select" id="difficultySelect" onchange="setDifficulty(this.value)">
-    <option value="easy">◎ Easy   Fixed Note (C3)</option>
-    <option value="medium" selected>◎ Medium   C3 / G3</option>
-    <option value="hard">◎ Hard   Random Notes</option>
-  </select>
-
   <div class="topbar-spacer"></div>
   <div class="timer-display" id="timerDisplay">03:00</div>
 
@@ -699,14 +601,12 @@
   </button>
 </header>
 
-<div id="loadStatus" class="load-status" style="display:none"></div>
-
 <main class="main">
 
   <section class="col-instruments">
-    <div class="col-label">Instruments   click to listen</div>
+    <div class="col-label">Instruments — click to listen</div>
 
-    <div class="instrument-card loading-disabled" id="card-flute" onclick="playInstrument('flute', this)">
+    <div class="instrument-card" id="card-flute" onclick="toggleInstrument('flute', this)">
       <div class="instrument-icon">🪈</div>
       <div class="instrument-info">
         <span class="instrument-name">Flute</span>
@@ -714,12 +614,12 @@
         <div class="waveform-wrap"><canvas class="waveform-canvas" id="wave-flute"></canvas></div>
       </div>
       <div class="card-btn-row">
-        <div class="play-btn" title="Play">▶</div>
+        <div class="play-btn" id="playbtn-flute" title="Play / Stop">▶</div>
         <div class="info-btn" title="About this instrument" onclick="openInfo('flute'); event.stopPropagation();">i</div>
       </div>
     </div>
 
-    <div class="instrument-card loading-disabled" id="card-clarinet" onclick="playInstrument('clarinet', this)">
+    <div class="instrument-card" id="card-clarinet" onclick="toggleInstrument('clarinet', this)">
       <div class="instrument-icon">🎵</div>
       <div class="instrument-info">
         <span class="instrument-name">Clarinet</span>
@@ -727,12 +627,12 @@
         <div class="waveform-wrap"><canvas class="waveform-canvas" id="wave-clarinet"></canvas></div>
       </div>
       <div class="card-btn-row">
-        <div class="play-btn" title="Play">▶</div>
+        <div class="play-btn" id="playbtn-clarinet" title="Play / Stop">▶</div>
         <div class="info-btn" title="About this instrument" onclick="openInfo('clarinet'); event.stopPropagation();">i</div>
       </div>
     </div>
 
-    <div class="instrument-card loading-disabled" id="card-violin" onclick="playInstrument('violin', this)">
+    <div class="instrument-card" id="card-violin" onclick="toggleInstrument('violin', this)">
       <div class="instrument-icon">🎻</div>
       <div class="instrument-info">
         <span class="instrument-name">Violin</span>
@@ -740,12 +640,12 @@
         <div class="waveform-wrap"><canvas class="waveform-canvas" id="wave-violin"></canvas></div>
       </div>
       <div class="card-btn-row">
-        <div class="play-btn" title="Play">▶</div>
+        <div class="play-btn" id="playbtn-violin" title="Play / Stop">▶</div>
         <div class="info-btn" title="About this instrument" onclick="openInfo('violin'); event.stopPropagation();">i</div>
       </div>
     </div>
 
-    <div class="instrument-card loading-disabled" id="card-trumpet" onclick="playInstrument('trumpet', this)">
+    <div class="instrument-card" id="card-trumpet" onclick="toggleInstrument('trumpet', this)">
       <div class="instrument-icon">🎺</div>
       <div class="instrument-info">
         <span class="instrument-name">Trumpet</span>
@@ -753,14 +653,14 @@
         <div class="waveform-wrap"><canvas class="waveform-canvas" id="wave-trumpet"></canvas></div>
       </div>
       <div class="card-btn-row">
-        <div class="play-btn" title="Play">▶</div>
+        <div class="play-btn" id="playbtn-trumpet" title="Play / Stop">▶</div>
         <div class="info-btn" title="About this instrument" onclick="openInfo('trumpet'); event.stopPropagation();">i</div>
       </div>
     </div>
   </section>
 
   <section class="col-descriptions">
-    <div class="col-label">Timbre Descriptors   drag to reorder</div>
+    <div class="col-label">Timbre Descriptors — drag to reorder</div>
 
     <p class="instructions">
       Listen to each instrument, then <strong>drag the description cards</strong> to match them to the correct instrument (top-to-bottom order matches left column). Click <strong>Check</strong> when ready.
@@ -809,7 +709,7 @@
     </div>
 
     <div class="info-section">
-      <div class="info-section-label">Waveform &amp; spectrum   replace with your images</div>
+      <div class="info-section-label">Waveform &amp; spectrum — replace with your images</div>
       <div class="img-grid" id="imgGrid"></div>
     </div>
 
@@ -843,94 +743,66 @@
 // ─────────────────────────────────────────────
 const INFO_DATA = {
   flute: {
-    icon: '🪈',
-    subtitle: 'Woodwind · Aerophone',
-    desc: 'The flute produces one of the purest, most transparent tones in the orchestra   its sound is close to a perfect sine wave. Cool and soft in character, with a delicate breathiness from the turbulent air jet at the embouchure hole. In its upper register it becomes piercingly bright; in the low register it is hushed and almost fragile.',
-    harm: 'The fundamental frequency dominates strongly. Overtones fall off very rapidly   the 2nd harmonic is faint and the 3rd is nearly absent. This sparse harmonic spectrum is the acoustic reason it sounds "pure": there is very little harmonic clutter above the main pitch.',
+    icon: '🪈', subtitle: 'Woodwind · Aerophone',
+    desc: 'The flute produces one of the purest, most transparent tones in the orchestra — its sound is close to a perfect sine wave. Cool and soft in character, with a delicate breathiness from the turbulent air jet at the embouchure hole. In its upper register it becomes piercingly bright; in the low register it is hushed and almost fragile.',
+    harm: 'The fundamental frequency dominates strongly. Overtones fall off very rapidly — the 2nd harmonic is faint and the 3rd is nearly absent. This sparse harmonic spectrum is the acoustic reason it sounds "pure": there is very little harmonic clutter above the main pitch.',
     harmonics: [1.0, 0.08, 0.03, 0.01, 0.005],
-    images: [
-      { label: 'Waveform', path: 'images/flute-waveform.png' },
-      { label: 'Spectrum',  path: 'images/flute-spectrum.png' },
-    ],
+    images: [{ label: 'Waveform', path: 'images/flute-waveform.png' }, { label: 'Spectrum', path: 'images/flute-spectrum.png' }],
     phys: 'A focused air jet blown across the embouchure hole creates a standing wave in the open cylindrical tube. The player controls pitch by changing fingering (effective tube length) and the speed/angle of the air stream. The turbulence at the blowing edge generates the characteristic breathy noise in the attack transient.',
-    fact: 'The modern Boehm-system flute is made of silver, gold, or platinum   despite being called a "woodwind". Ancient flutes carved from vulture bone have been found dating back over 40,000 years, making the flute one of the oldest known musical instruments in existence.',
-    tip: 'Focus on the silence between the notes   the flute\'s decay is very clean. If a sound has a slightly noisy, breathy attack that settles into something very pure and sine-like, it\'s almost certainly the flute.',
+    fact: 'The modern Boehm-system flute is made of silver, gold, or platinum — despite being called a "woodwind". Ancient flutes carved from vulture bone have been found dating back over 40,000 years, making the flute one of the oldest known musical instruments in existence.',
+    tip: 'Focus on the silence between the notes — the flute\'s decay is very clean. If a sound has a slightly noisy, breathy attack that settles into something very pure and sine-like, it\'s almost certainly the flute.',
   },
   clarinet: {
-    icon: '🎵',
-    subtitle: 'Woodwind · Single reed',
-
+    icon: '🎵', subtitle: 'Woodwind · Single reed',
     desc: 'The clarinet has a uniquely hollow, woody sound with a slight nasal quality that sets it apart from every other woodwind. Its lower register (the "chalumeau" register) is dark and rich; its upper register (the "clarion") is brighter and more penetrating. The transition between registers, called "the break", is an unmistakable feature of the instrument.',
-    harm: 'Odd harmonics (1st, 3rd, 5th, 7th…) dominate   even harmonics are substantially suppressed. This happens because the clarinet behaves acoustically like a closed-open pipe: it overblows at the 12th (three times the fundamental) instead of the octave. The "missing" even harmonics create that characteristic hollow quality.',
+    harm: 'Odd harmonics (1st, 3rd, 5th, 7th…) dominate — even harmonics are substantially suppressed. This happens because the clarinet behaves acoustically like a closed-open pipe: it overblows at the 12th (three times the fundamental) instead of the octave. The "missing" even harmonics create that characteristic hollow quality.',
     harmonics: [1.0, 0.04, 0.75, 0.02, 0.45, 0.01, 0.22, 0.005, 0.08],
-    images: [
-      { label: 'Waveform', path: 'images/clarinet-waveform.png' },
-      { label: 'Spectrum',  path: 'images/clarinet-spectrum.png' },
-    ],
-    phys: 'The single cane reed vibrates against the mouthpiece, acting as a pressure-controlled valve. Combined with a cylindrical bore that is effectively closed at the reed end, this produces resonance modes at odd multiples of the fundamental   suppressing even harmonics in a way no other common instrument does.',
-    fact: 'The clarinet was invented around 1700 by Johann Christoph Denner in Nuremberg. Mozart was one of its earliest champions   his Clarinet Concerto in A (K. 622) is still considered the greatest ever written for the instrument. It did not become a permanent fixture of the orchestra until the late 18th century.',
-    tip: 'Listen for the slightly nasal, hollow quality   like a sine wave with every other harmonic removed. There\'s also a subtle "squawk" at the start of each note from the reed\'s initial vibration. The jarring register jump (the break) is especially identifiable.',
+    images: [{ label: 'Waveform', path: 'images/clarinet-waveform.png' }, { label: 'Spectrum', path: 'images/clarinet-spectrum.png' }],
+    phys: 'The single cane reed vibrates against the mouthpiece, acting as a pressure-controlled valve. Combined with a cylindrical bore that is effectively closed at the reed end, this produces resonance modes at odd multiples of the fundamental — suppressing even harmonics in a way no other common instrument does.',
+    fact: 'The clarinet was invented around 1700 by Johann Christoph Denner in Nuremberg. Mozart was one of its earliest champions — his Clarinet Concerto in A (K. 622) is still considered the greatest ever written for the instrument.',
+    tip: 'Listen for the slightly nasal, hollow quality — like a sine wave with every other harmonic removed. There\'s also a subtle "squawk" at the start of each note from the reed\'s initial vibration.',
   },
   violin: {
-    icon: '🎻',
-    subtitle: 'String · Chordophone',
-
-    desc: 'The violin has the richest, most complex tone of the four   a dense weave of overtones that gives it that characteristic "full" and singing quality. Its sound can be intimate and tender, or soaring and intense, depending on bowing pressure, speed, and contact point. Vibrato   the slight oscillation of pitch   adds warmth and life that is immediately recognisable.',
+    icon: '🎻', subtitle: 'String · Chordophone',
+    desc: 'The violin has the richest, most complex tone of the four — a dense weave of overtones that gives it that characteristic "full" and singing quality. Its sound can be intimate and tender, or soaring and intense, depending on bowing pressure, speed, and contact point. Vibrato adds warmth and life that is immediately recognisable.',
     harm: 'Both even and odd harmonics are present in abundance. The harmonic stack extends richly up to the 8th or 10th partial and beyond, which is what creates that lush, crowded quality. The wooden body acts as a sophisticated filter, amplifying certain harmonics through its own resonant modes.',
     harmonics: [1.0, 0.65, 0.5, 0.38, 0.28, 0.18, 0.12, 0.07],
-    images: [
-      { label: 'Waveform', path: 'images/violin-waveform.png' },
-      { label: 'Spectrum',  path: 'images/violin-spectrum.png' },
-    ],
-    phys: 'Stick-slip bowing excites the string into what is called Helmholtz motion   a sharp kink that travels continuously around the string. This generates a rich sawtooth-like waveform. The vibration is transmitted via the bridge to the wooden body, which resonates and radiates sound with remarkable efficiency through f-shaped soundholes.',
-    fact: 'The finest violins were made in Cremona, Italy between 1650–1750 by makers like Stradivari and Guarneri. A Stradivarius can fetch over $15 million at auction. Acoustic scientists have spent decades trying to understand what makes them special   the exact secret of their varnish and wood treatment remains debated.',
-    tip: 'Listen for the scraping bow transient at the start of each note, then a sustained singing tone, often with vibrato. The sheer density of harmonics gives it a "crowded" quality   the opposite of the flute\'s purity. It also has expressive swells in volume within each note.',
+    images: [{ label: 'Waveform', path: 'images/violin-waveform.png' }, { label: 'Spectrum', path: 'images/violin-spectrum.png' }],
+    phys: 'Stick-slip bowing excites the string into Helmholtz motion — a sharp kink that travels continuously around the string. This generates a rich sawtooth-like waveform. The vibration is transmitted via the bridge to the wooden body, which resonates and radiates sound through f-shaped soundholes.',
+    fact: 'The finest violins were made in Cremona, Italy between 1650–1750 by makers like Stradivari and Guarneri. A Stradivarius can fetch over $15 million at auction.',
+    tip: 'Listen for the scraping bow transient at the start of each note, then a sustained singing tone, often with vibrato. The sheer density of harmonics gives it a "crowded" quality — the opposite of the flute\'s purity.',
   },
   trumpet: {
-    icon: '🎺',
-    subtitle: 'Brass · Aerophone',
-
-    desc: 'The trumpet has the most cutting, brilliant sound of the four   bright and assertive with a fast, hard attack. Its high-frequency harmonic content lets it project over a full orchestra with ease. At softer dynamics it can be warm and lyrical; at full power it is almost physically imposing. The characteristic "brassiness" actually increases at louder volumes, a unique physical effect.',
-    harm: 'Strong harmonics extend very high in the spectrum   up to the 10th, 12th, or beyond. The high-frequency energy is precisely what produces brassiness. Crucially, this high-partial reinforcement becomes stronger the louder the player blows   nonlinear shock-wave effects in the tubing actively amplify upper partials at high intensities.',
+    icon: '🎺', subtitle: 'Brass · Aerophone',
+    desc: 'The trumpet has the most cutting, brilliant sound of the four — bright and assertive with a fast, hard attack. Its high-frequency harmonic content lets it project over a full orchestra with ease. The characteristic "brassiness" actually increases at louder volumes, a unique physical effect.',
+    harm: 'Strong harmonics extend very high in the spectrum — up to the 10th, 12th, or beyond. The high-frequency energy is precisely what produces brassiness. This high-partial reinforcement becomes stronger the louder the player blows.',
     harmonics: [1.0, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.22, 0.16, 0.10],
-    images: [
-      { label: 'Waveform', path: 'images/trumpet-waveform.png' },
-      { label: 'Spectrum',  path: 'images/trumpet-spectrum.png' },
-    ],
-    phys: 'The player\'s lips act as a pressure-controlled valve, buzzing to create a periodic waveform. This drives air through a tube that is mostly cylindrical but ends in a dramatic flare (the bell). The flare creates a nonlinear resonance that dramatically amplifies high harmonics   especially at fortissimo   producing the hallmark brassy edge.',
-    fact: 'Trumpets were found in the tomb of Tutankhamun (c. 1323 BC)   two of the oldest playable instruments ever discovered. In 1939, a BBC musician played one live on radio, and the vibration caused parts of the museum display to rattle. The modern valved trumpet was developed in the early 19th century; before that, players used natural harmonics only.',
-    tip: 'Listen for the bright, metallic "sizzle" that cuts through everything   especially in the upper harmonics. The attack is fast and assertive, with very little of the bow scrape or breath noise of the other three. At high volume there is a distinct buzzy edge. If the sound feels like it could physically project across a football field, it\'s the trumpet.',
+    images: [{ label: 'Waveform', path: 'images/trumpet-waveform.png' }, { label: 'Spectrum', path: 'images/trumpet-spectrum.png' }],
+    phys: 'The player\'s lips act as a pressure-controlled valve, buzzing to create a periodic waveform. This drives air through a tube that ends in a dramatic flare (the bell). The flare creates a nonlinear resonance that dramatically amplifies high harmonics at fortissimo.',
+    fact: 'Trumpets were found in the tomb of Tutankhamun (c. 1323 BC) — two of the oldest playable instruments ever discovered. The modern valved trumpet was developed in the early 19th century.',
+    tip: 'Listen for the bright, metallic "sizzle" that cuts through everything. The attack is fast and assertive. At high volume there is a distinct buzzy edge that no other instrument in this set produces.',
   },
 };
 
 function openInfo(name) {
   const d = INFO_DATA[name];
-
-  document.getElementById('sheetIcon').textContent    = d.icon;
-  document.getElementById('sheetTitle').textContent   = name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('sheetIcon').textContent     = d.icon;
+  document.getElementById('sheetTitle').textContent    = name.charAt(0).toUpperCase() + name.slice(1);
   document.getElementById('sheetSubtitle').textContent = d.subtitle;
-  document.getElementById('sheetDesc').textContent    = d.desc;
-  document.getElementById('sheetHarm').textContent    = d.harm;
-  document.getElementById('sheetPhys').textContent    = d.phys;
-  document.getElementById('sheetFact').textContent    = d.fact;
-  document.getElementById('sheetTip').textContent     = d.tip;
+  document.getElementById('sheetDesc').textContent     = d.desc;
+  document.getElementById('sheetHarm').textContent     = d.harm;
+  document.getElementById('sheetPhys').textContent     = d.phys;
+  document.getElementById('sheetFact').textContent     = d.fact;
+  document.getElementById('sheetTip').textContent      = d.tip;
 
-  // Harmonic bar chart
   const maxH = 60;
   document.getElementById('harmonicChart').innerHTML = d.harmonics
-    .map((v, i) => `
-      <div class="harmonic-bar-wrap">
-        <div class="harmonic-bar" style="height:${Math.round(v * maxH)}px"></div>
-        <span class="harmonic-n">${i + 1}</span>
-      </div>`)
+    .map((v, i) => `<div class="harmonic-bar-wrap"><div class="harmonic-bar" style="height:${Math.round(v*maxH)}px"></div><span class="harmonic-n">${i+1}</span></div>`)
     .join('');
 
-  // Image grid   show placeholder until image loads
   document.getElementById('imgGrid').innerHTML = d.images.map(img => `
     <div class="img-slot">
-      <img src="${img.path}" alt="${img.label}"
-           onload="this.classList.add('loaded')"
-           onerror="this.remove()">
+      <img src="${img.path}" alt="${img.label}" onload="this.classList.add('loaded')" onerror="this.remove()">
       <div class="img-slot-icon">🖼</div>
       <div class="img-slot-label">${img.label}</div>
       <div class="img-slot-path">${img.path}</div>
@@ -947,23 +819,115 @@ function closeInfo() {
 }
 
 // ─────────────────────────────────────────────
-//  AUDIO ENGINE   Prerecorded clips
+//  AUDIO ENGINE — Additive synthesis
+//  Base frequency: 100 Hz
+//  All instruments are sustained (toggle on/off)
 // ─────────────────────────────────────────────
 
-// ➜ Put your audio files in an "audio/" folder next to this HTML file.
-//   Supported formats: .mp3 (best compatibility) or .ogg / .wav
-//   Name them exactly as the paths below, or change the paths to match your files.
-const CLIP_PATHS = {
-  flute:    'audio/flute.mp3',
-  clarinet: 'audio/clarinet.mp3',
-  violin:   'audio/violin.mp3',
-  trumpet:  'audio/trumpet.mp3',
+const BASE_FREQ = 100; // Hz — low, clearly pitched fundamental
+
+/*
+  Harmonic recipe format: [multiplier, amplitude]
+  Each instrument has a distinct stack of sine partials summed together.
+  Amplitudes are intentionally high (master gain 0.7) so the sound is loud.
+
+  FLUTE   — nearly pure, only low partials, gentle noise layer
+  CLARINET — strong ODD harmonics (1,3,5,7,9,11), weak even — the hollow "closed pipe" effect
+  VIOLIN   — dense even+odd, sawtooth-like, vibrato on all partials
+  TRUMPET  — saturated full harmonic series, very strong high partials
+*/
+const SYNTH_CONFIG = {
+  flute: {
+    harmonics: [
+      [1, 1.00],   // fundamental — dominant
+      [2, 0.18],   // very faint 2nd
+      [3, 0.07],   // barely there 3rd
+      [4, 0.03],
+      [5, 0.01],
+    ],
+    noise: 0.06,   // breathy air noise
+    attack: 0.10,
+    release: 0.18,
+    vibrato: { rate: 5.2, depth: 2.5 },
+    masterGain: 0.70,
+  },
+  clarinet: {
+    harmonics: [
+      [1,  1.00],  // fundamental
+      [2,  0.05],  // suppressed even
+      [3,  0.90],  // strong 3rd — key clarinet signature
+      [4,  0.04],
+      [5,  0.70],  // strong 5th
+      [6,  0.03],
+      [7,  0.50],  // strong 7th
+      [8,  0.02],
+      [9,  0.30],  // 9th
+      [10, 0.01],
+      [11, 0.18],  // 11th
+      [12, 0.01],
+      [13, 0.08],
+    ],
+    noise: 0.02,
+    attack: 0.05,
+    release: 0.12,
+    vibrato: { rate: 4.8, depth: 1.8 },
+    masterGain: 0.68,
+  },
+  violin: {
+    harmonics: [
+      [1,  1.00],
+      [2,  0.80],  // rich even harmonics — sawtooth character
+      [3,  0.65],
+      [4,  0.55],
+      [5,  0.45],
+      [6,  0.36],
+      [7,  0.28],
+      [8,  0.22],
+      [9,  0.16],
+      [10, 0.12],
+      [11, 0.08],
+      [12, 0.05],
+    ],
+    noise: 0.015,  // bow scrape
+    attack: 0.22,  // slower bowed attack
+    release: 0.25,
+    vibrato: { rate: 6.0, depth: 4.5 }, // deeper vibrato
+    masterGain: 0.65,
+  },
+  trumpet: {
+    harmonics: [
+      [1,  1.00],
+      [2,  0.90],
+      [3,  0.85],
+      [4,  0.80],
+      [5,  0.74],
+      [6,  0.68],
+      [7,  0.60],
+      [8,  0.52],
+      [9,  0.44],
+      [10, 0.36],
+      [11, 0.28],
+      [12, 0.20],
+      [13, 0.14],
+      [14, 0.09],
+      [15, 0.05],
+    ],
+    noise: 0.00,
+    attack: 0.02,  // fast brassy attack
+    release: 0.08,
+    vibrato: { rate: 5.5, depth: 2.0 },
+    masterGain: 0.72,
+  },
 };
 
-let currentDifficulty = 'medium';
-let audioCtx  = null;
-let audioBuffers = {};   // decoded AudioBuffers keyed by instrument name
-let activeSource = null; // currently playing BufferSourceNode (so we can stop it)
+let audioCtx = null;
+
+// Per-instrument live node graph (null when stopped)
+const liveNodes = {
+  flute: null, clarinet: null, violin: null, trumpet: null,
+};
+
+let animFrames = {};
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -971,106 +935,144 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-async function loadClip(name) {
-  const response = await fetch(CLIP_PATHS[name]);
-  if (!response.ok) throw new Error(`HTTP ${response.status} for ${CLIP_PATHS[name]}`);
-  const arrayBuffer = await response.arrayBuffer();
-  return getAudioCtx().decodeAudioData(arrayBuffer);
-}
-
-async function initAudio() {
-  const el = document.getElementById('loadStatus');
-  const show = (msg, hide) => { el.textContent = msg; el.style.display = hide ? 'none' : 'block'; };
-  show('Loading audio clips…', false);
-
-  const names = Object.keys(CLIP_PATHS);
-  let loaded = 0, failed = [];
-
-  await Promise.all(names.map(name =>
-    loadClip(name)
-      .then(buf => {
-        audioBuffers[name] = buf;
-        loaded++;
-        show(`Loading… ${name} ✓`, false);
-      })
-      .catch(err => {
-        failed.push(name);
-        console.warn(`Could not load clip for ${name}:`, err);
-      })
-  ));
-
-  if (failed.length === names.length) {
-    show('⚠ No audio files found   add clips to the audio/ folder', false);
-    // Still enable cards so the UI works; clicking will just do nothing audible
-  } else if (failed.length > 0) {
-    show(`⚠ Missing clips: ${failed.join(', ')}`, false);
-    setTimeout(() => show('', true), 4000);
+// ── Toggle play/stop ──
+function toggleInstrument(name, cardEl) {
+  if (liveNodes[name]) {
+    stopInstrument(name, cardEl);
   } else {
-    show('', true);
+    startInstrument(name, cardEl);
   }
-
-  document.querySelectorAll('.instrument-card').forEach(c => c.classList.remove('loading-disabled'));
 }
 
-let animFrames = {};
-
-function playInstrument(name, cardEl) {
+function startInstrument(name, cardEl) {
   getAudioCtx();
+  const ctx = audioCtx;
+  const cfg = SYNTH_CONFIG[name];
+  const now = ctx.currentTime;
 
-  // Stop any currently playing clip
-  if (activeSource) {
-    try { activeSource.stop(); } catch(e) {}
-    activeSource = null;
-  }
+  // ── Master gain (with attack ramp) ──
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0, now);
+  master.gain.linearRampToValueAtTime(cfg.masterGain, now + cfg.attack);
+  master.connect(ctx.destination);
 
-  // Clear previous playing state
-  document.querySelectorAll('.instrument-card.playing').forEach(c => {
-    c.classList.remove('playing');
-    if (animFrames[c.id]) cancelAnimationFrame(animFrames[c.id]);
+  // ── Analyser for waveform visualiser ──
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 512;
+  master.connect(analyser);
+
+  const nodes = { master, analyser, oscillators: [], lfoNodes: [] };
+
+  // ── Vibrato LFO (modulates all oscillator frequencies) ──
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.frequency.value = cfg.vibrato.rate;
+  lfoGain.gain.value  = cfg.vibrato.depth;
+  lfo.connect(lfoGain);
+  lfo.start(now);
+  nodes.lfoNodes.push(lfo, lfoGain);
+
+  // ── Additive partials ──
+  cfg.harmonics.forEach(([mult, amp]) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.value = BASE_FREQ * mult;
+
+    // LFO frequency modulation on each partial
+    lfoGain.connect(osc.frequency);
+
+    gain.gain.value = amp;
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(now);
+    nodes.oscillators.push({ osc, gain });
   });
 
-  cardEl.classList.add('playing');
-  addRipple(cardEl);
+  // ── Breathy noise layer (flute / clarinet) ──
+  if (cfg.noise > 0) {
+    const bufSize  = ctx.sampleRate * 2;
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data     = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
 
-  const buf = audioBuffers[name];
-  if (!buf) {
-    // No clip loaded   just show playing state briefly
-    setTimeout(() => cardEl.classList.remove('playing'), 1500);
-    return;
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuf;
+    noiseSource.loop   = true;
+
+    // Band-pass filter around fundamental so noise feels pitched
+    const bpf = ctx.createBiquadFilter();
+    bpf.type            = 'bandpass';
+    bpf.frequency.value = BASE_FREQ * 1.5;
+    bpf.Q.value         = 0.8;
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = cfg.noise;
+
+    noiseSource.connect(bpf);
+    bpf.connect(noiseGain);
+    noiseGain.connect(master);
+    noiseSource.start(now);
+    nodes.noiseSource = noiseSource;
+    nodes.noiseGain   = noiseGain;
   }
 
-  const ctx      = getAudioCtx();
-  const analyser = ctx.createAnalyser();
-  analyser.fftSize = 256;
+  liveNodes[name] = nodes;
 
-  const source = ctx.createBufferSource();
-  source.buffer = buf;
-  source.connect(analyser);
-  analyser.connect(ctx.destination);
-  source.start(0);
-  activeSource = source;
-
-  const duration = buf.duration;
+  // ── UI ──
+  cardEl.classList.add('playing');
+  document.getElementById('playbtn-' + name).textContent = '■';
+  addRipple(cardEl);
 
   const canvas = document.getElementById('wave-' + name);
   if (canvas) drawWaveform(canvas, analyser, name);
-
-  source.onended = () => {
-    cardEl.classList.remove('playing');
-    if (animFrames[name]) cancelAnimationFrame(animFrames[name]);
-    if (activeSource === source) activeSource = null;
-  };
-
-  // Safety fallback in case onended doesn't fire
-  setTimeout(() => {
-    cardEl.classList.remove('playing');
-    if (animFrames[name]) cancelAnimationFrame(animFrames[name]);
-  }, (duration + 0.3) * 1000);
 }
 
+function stopInstrument(name, cardEl) {
+  const nodes = liveNodes[name];
+  if (!nodes) return;
+  const ctx = audioCtx;
+  const now = ctx.currentTime;
+  const cfg = SYNTH_CONFIG[name];
+
+  // Release ramp then disconnect
+  nodes.master.gain.setValueAtTime(nodes.master.gain.value, now);
+  nodes.master.gain.linearRampToValueAtTime(0, now + cfg.release);
+
+  setTimeout(() => {
+    try {
+      nodes.oscillators.forEach(({ osc }) => osc.stop());
+      nodes.lfoNodes.forEach(n => { if (n.stop) n.stop(); });
+      if (nodes.noiseSource) nodes.noiseSource.stop();
+      nodes.master.disconnect();
+      nodes.analyser.disconnect();
+    } catch(e) {}
+    liveNodes[name] = null;
+  }, (cfg.release + 0.05) * 1000);
+
+  // Cancel waveform draw
+  if (animFrames[name]) {
+    cancelAnimationFrame(animFrames[name]);
+    delete animFrames[name];
+  }
+
+  // ── UI ──
+  if (!cardEl) cardEl = document.getElementById('card-' + name);
+  cardEl.classList.remove('playing');
+  document.getElementById('playbtn-' + name).textContent = '▶';
+}
+
+function stopAll() {
+  ['flute', 'clarinet', 'violin', 'trumpet'].forEach(name => {
+    if (liveNodes[name]) stopInstrument(name);
+  });
+}
+
+// ── Waveform visualiser ──
 function drawWaveform(canvas, analyser, name) {
   const ctx2d = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
+  const dpr   = window.devicePixelRatio || 1;
   canvas.width  = canvas.offsetWidth  * dpr;
   canvas.height = canvas.offsetHeight * dpr;
   ctx2d.scale(dpr, dpr);
@@ -1079,11 +1081,12 @@ function drawWaveform(canvas, analyser, name) {
   const data   = new Uint8Array(bufLen);
 
   function draw() {
+    if (!liveNodes[name]) return; // stop drawing when stopped
     animFrames[name] = requestAnimationFrame(draw);
     analyser.getByteTimeDomainData(data);
     ctx2d.clearRect(0, 0, W, H);
-    ctx2d.strokeStyle = 'rgba(126,232,250,0.7)';
-    ctx2d.lineWidth = 1.5;
+    ctx2d.strokeStyle = 'rgba(126,232,250,0.75)';
+    ctx2d.lineWidth   = 1.5;
     ctx2d.beginPath();
     const sliceW = W / bufLen;
     let x = 0;
@@ -1112,7 +1115,7 @@ const INSTRUMENTS_ORDER = ['flute', 'clarinet', 'violin', 'trumpet'];
 const DESCRIPTIONS = {
   flute:    'breathy, floaty, cuts through like a whistle',
   clarinet: 'reedy, hollow in the middle, almost nasal',
-  violin:   'warm, bowed, singing   lots of hair and rosin',
+  violin:   'warm, bowed, singing — lots of hair and rosin',
   trumpet:  'bright, blaring, that classic brass punch',
 };
 
@@ -1130,10 +1133,10 @@ function buildDescCards() {
   list.innerHTML = '';
   shuffle(INSTRUMENTS_ORDER).forEach((key, i) => {
     const card = document.createElement('div');
-    card.className = 'desc-card';
-    card.draggable = true;
+    card.className  = 'desc-card';
+    card.draggable  = true;
     card.dataset.key = key;
-    card.innerHTML = `
+    card.innerHTML  = `
       <div class="drag-handle"><span></span><span></span><span></span></div>
       <div class="desc-index">${i + 1}</div>
       <div class="desc-text">${DESCRIPTIONS[key]}</div>
@@ -1257,14 +1260,10 @@ function checkAnswers() {
   });
 
   const panel = document.getElementById('scorePanel');
-  document.getElementById('scoreNum').textContent  = score + '/4';
-  document.getElementById('scoreMsg').textContent  =
+  document.getElementById('scoreNum').textContent = score + '/4';
+  document.getElementById('scoreMsg').textContent =
     ['Keep listening! 🎧', 'Getting warmer! 🔥', 'Almost there! 🎵', 'Great ear! ⭐', 'Perfect pitch! 🏆'][score];
   panel.classList.add('visible');
-
-  if (currentDifficulty === 'hard' && score < 4) {
-    setTimeout(() => panel.classList.remove('visible'), 3000);
-  }
 }
 
 function clearFeedback() {
@@ -1273,25 +1272,20 @@ function clearFeedback() {
 }
 
 // ─────────────────────────────────────────────
-//  TIMER
+//  TIMER — 3 minute countdown
 // ─────────────────────────────────────────────
-const COUNTDOWN_SECONDS = 180; // 3 minutes for all difficulties
+const COUNTDOWN_SECONDS = 180;
 let timerInterval = null, remaining = COUNTDOWN_SECONDS;
 
 function startTimer() {
   clearInterval(timerInterval);
-  remaining = currentDifficulty === 'hard' ? 60 : COUNTDOWN_SECONDS;
+  remaining = COUNTDOWN_SECONDS;
   updateTimerDisplay();
   timerInterval = setInterval(() => {
     remaining--;
     updateTimerDisplay();
-    if (remaining <= 30) {
-      document.getElementById('timerDisplay').classList.add('urgent');
-    }
-    if (remaining <= 0) {
-      clearInterval(timerInterval);
-      checkAnswers();
-    }
+    if (remaining <= 30) document.getElementById('timerDisplay').classList.add('urgent');
+    if (remaining <= 0) { clearInterval(timerInterval); checkAnswers(); }
   }, 1000);
 }
 
@@ -1301,21 +1295,13 @@ function updateTimerDisplay() {
   document.getElementById('timerDisplay').textContent = m + ':' + s;
 }
 
-function setDifficulty(val) {
-  currentDifficulty = val;
-  document.getElementById('timerDisplay').classList.remove('urgent');
-  resetGame();
-}
-
 function resetGame() {
+  stopAll();
   clearInterval(timerInterval);
   document.getElementById('timerDisplay').classList.remove('urgent');
   buildDescCards();
   startTimer();
   clearFeedback();
-  document.querySelectorAll('.instrument-card.playing').forEach(c => c.classList.remove('playing'));
-  Object.values(animFrames).forEach(id => cancelAnimationFrame(id));
-  animFrames = {};
 }
 
 // ─────────────────────────────────────────────
@@ -1324,7 +1310,6 @@ function resetGame() {
 window.addEventListener('load', () => {
   buildDescCards();
   startTimer();
-  initAudio();
 });
 </script>
 </body>

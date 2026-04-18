@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tmbre Lab : Timbre Perception Game</title>
+<title>Tmbre Lab — Timbre Perception Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -530,17 +530,11 @@
   }
   .harmonic-n { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--text-dim); }
 
-  .img-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 12px;
-  }
   .img-slot {
     border-radius: 10px;
     border: 1px dashed var(--border-bright);
     background: var(--surface2);
-    aspect-ratio: 4/3;
+    aspect-ratio: 16/9;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -548,13 +542,13 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+    margin-top: 12px;
+    width: 100%;
   }
   .img-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
-  .img-slot-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: center; position: relative; z-index: 1; }
   .img-slot-path { font-family: 'DM Mono', monospace; font-size: 0.55rem; color: var(--text-dim); opacity: 0.6; text-align: center; position: relative; z-index: 1; }
   .img-slot-icon { font-size: 1.5rem; opacity: 0.2; position: relative; z-index: 1; }
   .img-slot img.loaded ~ .img-slot-icon,
-  .img-slot img.loaded ~ .img-slot-label,
   .img-slot img.loaded ~ .img-slot-path { display: none; }
 
   .fact-pill, .tip-pill {
@@ -580,7 +574,6 @@
     .col-descriptions { padding: 20px 16px; }
     .btn span { display: none; }
     .touch-hint { display: block; }
-    .img-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -719,8 +712,8 @@
     </div>
 
     <div class="info-section">
-      <div class="info-section-label">Waveform &amp; spectrum — replace with your images</div>
-      <div class="img-grid" id="imgGrid"></div>
+      <div class="info-section-label">Image</div>
+      <div id="imgSlot"></div>
     </div>
 
     <div class="info-section">
@@ -757,7 +750,6 @@ const INFO_DATA = {
     desc: 'The flute produces one of the purest, most transparent tones in the orchestra — its sound is close to a perfect sine wave. Cool and soft in character, with a delicate breathiness from the turbulent air jet at the embouchure hole. In its upper register it becomes piercingly bright; in the low register it is hushed and almost fragile.',
     harm: 'The fundamental frequency dominates strongly. Overtones fall off very rapidly — the 2nd harmonic is faint and the 3rd is nearly absent. This sparse harmonic spectrum is the acoustic reason it sounds "pure": there is very little harmonic clutter above the main pitch.',
     harmonics: [1.0, 0.08, 0.03, 0.01, 0.005],
-    images: [{ label: 'Waveform', path: 'images/flute-waveform.png' }, { label: 'Spectrum', path: 'images/flute-spectrum.png' }],
     phys: 'A focused air jet blown across the embouchure hole creates a standing wave in the open cylindrical tube. The player controls pitch by changing fingering (effective tube length) and the speed/angle of the air stream. The turbulence at the blowing edge generates the characteristic breathy noise in the attack transient.',
     fact: 'The modern Boehm-system flute is made of silver, gold, or platinum — despite being called a "woodwind". Ancient flutes carved from vulture bone have been found dating back over 40,000 years, making the flute one of the oldest known musical instruments in existence.',
     tip: 'Focus on the silence between the notes — the flute\'s decay is very clean. If a sound has a slightly noisy, breathy attack that settles into something very pure and sine-like, it\'s almost certainly the flute.',
@@ -767,7 +759,6 @@ const INFO_DATA = {
     desc: 'The clarinet has a uniquely hollow, woody sound with a slight nasal quality that sets it apart from every other woodwind. Its lower register (the "chalumeau" register) is dark and rich; its upper register (the "clarion") is brighter and more penetrating. The transition between registers, called "the break", is an unmistakable feature of the instrument.',
     harm: 'Odd harmonics (1st, 3rd, 5th, 7th…) dominate — even harmonics are substantially suppressed. This happens because the clarinet behaves acoustically like a closed-open pipe: it overblows at the 12th (three times the fundamental) instead of the octave. The "missing" even harmonics create that characteristic hollow quality.',
     harmonics: [1.0, 0.04, 0.75, 0.02, 0.45, 0.01, 0.22, 0.005, 0.08],
-    images: [{ label: 'Waveform', path: 'images/clarinet-waveform.png' }, { label: 'Spectrum', path: 'images/clarinet-spectrum.png' }],
     phys: 'The single cane reed vibrates against the mouthpiece, acting as a pressure-controlled valve. Combined with a cylindrical bore that is effectively closed at the reed end, this produces resonance modes at odd multiples of the fundamental — suppressing even harmonics in a way no other common instrument does.',
     fact: 'The clarinet was invented around 1700 by Johann Christoph Denner in Nuremberg. Mozart was one of its earliest champions — his Clarinet Concerto in A (K. 622) is still considered the greatest ever written for the instrument.',
     tip: 'Listen for the slightly nasal, hollow quality — like a sine wave with every other harmonic removed. There\'s also a subtle "squawk" at the start of each note from the reed\'s initial vibration.',
@@ -777,7 +768,6 @@ const INFO_DATA = {
     desc: 'The violin has the richest, most complex tone of the four — a dense weave of overtones that gives it that characteristic "full" and singing quality. Its sound can be intimate and tender, or soaring and intense, depending on bowing pressure, speed, and contact point. Vibrato adds warmth and life that is immediately recognisable.',
     harm: 'Both even and odd harmonics are present in abundance. The harmonic stack extends richly up to the 8th or 10th partial and beyond, which is what creates that lush, crowded quality. The wooden body acts as a sophisticated filter, amplifying certain harmonics through its own resonant modes.',
     harmonics: [1.0, 0.65, 0.5, 0.38, 0.28, 0.18, 0.12, 0.07],
-    images: [{ label: 'Waveform', path: 'images/violin-waveform.png' }, { label: 'Spectrum', path: 'images/violin-spectrum.png' }],
     phys: 'Stick-slip bowing excites the string into Helmholtz motion — a sharp kink that travels continuously around the string. This generates a rich sawtooth-like waveform. The vibration is transmitted via the bridge to the wooden body, which resonates and radiates sound through f-shaped soundholes.',
     fact: 'The finest violins were made in Cremona, Italy between 1650–1750 by makers like Stradivari and Guarneri. A Stradivarius can fetch over $15 million at auction.',
     tip: 'Listen for the scraping bow transient at the start of each note, then a sustained singing tone, often with vibrato. The sheer density of harmonics gives it a "crowded" quality — the opposite of the flute\'s purity.',
@@ -787,7 +777,6 @@ const INFO_DATA = {
     desc: 'The trumpet has the most cutting, brilliant sound of the four — bright and assertive with a fast, hard attack. Its high-frequency harmonic content lets it project over a full orchestra with ease. The characteristic "brassiness" actually increases at louder volumes, a unique physical effect.',
     harm: 'Strong harmonics extend very high in the spectrum — up to the 10th, 12th, or beyond. The high-frequency energy is precisely what produces brassiness. This high-partial reinforcement becomes stronger the louder the player blows.',
     harmonics: [1.0, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.22, 0.16, 0.10],
-    images: [{ label: 'Waveform', path: 'images/trumpet-waveform.png' }, { label: 'Spectrum', path: 'images/trumpet-spectrum.png' }],
     phys: 'The player\'s lips act as a pressure-controlled valve, buzzing to create a periodic waveform. This drives air through a tube that ends in a dramatic flare (the bell). The flare creates a nonlinear resonance that dramatically amplifies high harmonics at fortissimo.',
     fact: 'Trumpets were found in the tomb of Tutankhamun (c. 1323 BC) — two of the oldest playable instruments ever discovered. The modern valved trumpet was developed in the early 19th century.',
     tip: 'Listen for the bright, metallic "sizzle" that cuts through everything. The attack is fast and assertive. At high volume there is a distinct buzzy edge that no other instrument in this set produces.',
@@ -826,13 +815,12 @@ function openInfo(name) {
     .map((v, i) => `<div class="harmonic-bar-wrap"><div class="harmonic-bar" style="height:${Math.round(v*maxH)}px"></div><span class="harmonic-n">${i+1}</span></div>`)
     .join('');
 
-  document.getElementById('imgGrid').innerHTML = d.images.map(img => `
+  document.getElementById('imgSlot').innerHTML = `
     <div class="img-slot">
-      <img src="${img.path}" alt="${img.label}" onload="this.classList.add('loaded')" onerror="this.remove()">
+      <img src="${name}.jpeg" alt="${name}" onload="this.classList.add('loaded')" onerror="this.remove()">
       <div class="img-slot-icon">🖼</div>
-      <div class="img-slot-label">${img.label}</div>
-      <div class="img-slot-path">${img.path}</div>
-    </div>`).join('');
+      <div class="img-slot-path">${name}.jpeg</div>
+    </div>`;
 
   document.getElementById('infoSheet').classList.add('open');
   document.getElementById('sheetBackdrop').classList.add('open');
